@@ -1,24 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
+import addToMailchimp from 'gatsby-plugin-mailchimp';
+// Components
+import Button from './Button';
+// Styles
 import { StyledSubscribe } from './styles/StyledSubscribe';
 
-const Subscribe = () => (
-  <StyledSubscribe>
-    <div className='container'>
-      <div className='row'>
-        <div className='col-md-9'>
-          <form className='email-form'>
-            <input
-              className='email'
-              type='text'
-              name='email'
-              placeholder='Want to get the latest news?'
-            />
-            <button type='submit'>Register Email</button>
-          </form>
-        </div>
+const Subscribe = () => {
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const data = await addToMailchimp(email);
+
+    if (data.result === 'error') setEmail('Not a valid email.');
+    if (data.result === 'success') setEmail('Thank you!');
+  };
+
+  return (
+    <StyledSubscribe>
+      <div className='container'>
+        <form className='email-form' onSubmit={handleSubmit}>
+          <input
+            className='email'
+            type='text'
+            name='email'
+            placeholder='Want news and discounts? No spam!'
+            value={email}
+            onChange={e => setEmail(e.currentTarget.value)}
+          />
+          <Button type='submit' color='dark' text='Subscribe' />
+        </form>
       </div>
-    </div>
-  </StyledSubscribe>
-);
+    </StyledSubscribe>
+  );
+};
 
 export default Subscribe;
